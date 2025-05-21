@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GeoBus Marrakech</string>
+
+    <!-- Messages généraux -->
+    <string name="loading">Chargement...</string>
+    <string name="error_loading_stops">Erreur lors du chargement des arrêts de bus</string>
+    <string name="retry">Réessayer</string>
+    <string name="no_internet">Pas de connexion Internet</string>
+
+    <!-- Carte -->
+    <string name="map_title">Stations de Bus Marrakech</string>
+    <string name="location_permission_required">L\'autorisation de localisation est nécessaire pour afficher votre position</string>
+    <string name="grant_permission">Autoriser</string>
+    <string name="nearest_stop">Arrêt le plus proche : %1$s</string>
+    <string name="distance_meters">Distance : %1$d m</string>
+    <string name="walking_time_minutes">Temps de marche : %1$d min</string>
+    <string name="finding_nearest_stop">Recherche de l\'arrêt le plus proche...</string>
+    <string name="location_not_available">Localisation non disponible</string>
+
+    <!-- Informations d'arrêt -->
+    <string name="stop_details">Détails de l\'arrêt</string>
+    <string name="directions">ITINÉRAIRE</string>
+    <string name="show_all_stops">Tous les arrêts</string>
+    <string name="center_on_me">Ma position</string>
+
+    <!-- Messages d'erreur spécifiques -->
+    <string name="error_opening_maps">Impossible d\'ouvrir Google Maps. Vérifiez que l\'application est installée.</string>
+    <string name="error_no_maps_app">Impossible d\'ouvrir l\'itinéraire. Aucune application compatible.</string>
+    <string name="error_no_nearest_stop">Aucune station proche n\'a été trouvée</string>
+
+    <!-- Menu -->
+    <string name="menu_refresh">Actualiser</string>
+    <string name="menu_settings">Paramètres</string>
+    <string name="menu_about">À propos</string>
+
+    <!-- Login et Inscription -->
+    <string name="login_subtitle">Connectez-vous pour accéder à votre compte</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe</string>
+    <string name="login">Se connecter</string>
+    <string name="no_account_prompt">Vous n\'avez pas de compte ?</string>
+    <string name="register">S\'inscrire</string>
+    <string name="error_field_required">Ce champ est obligatoire</string>
+    <string name="error_passwords_dont_match">Les mots de passe ne correspondent pas</string>
+    <string name="have_account_prompt">Vous avez déjà un compte ?</string>
+    <string name="name">Nom</string>
+    <string name="confirm_password">Confirmer le mot de passe</string>
+</resources>
