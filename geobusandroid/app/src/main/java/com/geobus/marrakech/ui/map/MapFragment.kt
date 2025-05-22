@@ -48,6 +48,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private val busMarkers = mutableListOf<Marker>()
 
     private var showBuses = true // État pour afficher/masquer les bus
+    private var autoNavigationEnabled = true // État pour activer/désactiver la navigation automatique
 
     // Permission de localisation
     private val requestPermissionLauncher = registerForActivityResult(
@@ -219,6 +220,36 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         viewModel.busesForStop.observe(viewLifecycleOwner) { buses ->
             Log.d(TAG, "Bus pour station: ${buses.size} bus")
             displayBusesForStopInfo(buses)
+        }
+
+        // Observer si l'utilisateur est près d'une station
+        viewModel.isNearStop.observe(viewLifecycleOwner) { stop ->
+            stop?.let {
+                Log.d(TAG, "Utilisateur près de la station: ${it.stopName}")
+
+                if (autoNavigationEnabled) {
+                    Log.d(TAG, "Navigation automatique activée, navigation vers les détails de la station")
+                    // Afficher un message à l'utilisateur
+                    Snackbar.make(
+                        binding.root,
+                        "Vous êtes près de la station ${it.stopName}. Navigation automatique...",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+
+                    // Naviguer vers les détails de la station
+                    findNavController().navigate(
+                        MapFragmentDirections.actionMapFragmentToStopDetailFragment(it.stopId)
+                    )
+                } else {
+                    Log.d(TAG, "Navigation automatique désactivée, pas de navigation")
+                    // Afficher un message discret pour informer l'utilisateur
+                    Snackbar.make(
+                        binding.root,
+                        "Vous êtes près de la station ${it.stopName}",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
 
         // Observer l'état de chargement
@@ -618,6 +649,28 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.menu_auto_navigation -> {
+                // Toggle the checked state
+                item.isChecked = !item.isChecked
+                // Toggle auto-navigation flag
+                autoNavigationEnabled = item.isChecked
+                // Show a message to the user
+                val message = if (item.isChecked) {
+                    "Navigation automatique activée"
+                } else {
+                    "Navigation automatique désactivée"
+                }
+                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+
+                // Reset the isNearStop LiveData if auto-navigation is disabled
+                if (!autoNavigationEnabled) {
+                    viewModel.isNearStop.value?.let {
+                        Log.d(TAG, "Réinitialisation de l'état isNearStop")
+                    }
+                }
+
+                true
+            }
             R.id.menu_logout -> {
                 logout()
                 true

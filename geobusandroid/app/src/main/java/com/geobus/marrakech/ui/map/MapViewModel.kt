@@ -47,9 +47,19 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
+    // Indique si l'utilisateur est près d'une station
+    private val _isNearStop = MutableLiveData<Stop?>()
+    val isNearStop: LiveData<Stop?> = _isNearStop
+
     // Contrôle du rafraîchissement automatique
     private var refreshTimer: Timer? = null
     private var isRefreshingEnabled = false
+
+    // Seuil de distance pour considérer l'utilisateur près d'une station (en mètres)
+    private val NEAR_STOP_THRESHOLD = 50.0
+
+    // Contrôle si la navigation automatique est activée
+    private var autoNavigationEnabled = true
 
     /**
      * Charge toutes les stations de bus de Marrakech
@@ -65,6 +75,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
                     _stops.value = stopsResult
                     Log.d("MapViewModel", "Stations chargées: ${stopsResult.size}")
                 } else {
+                    _stops.value = emptyList()
                     _errorMessage.value = "Erreur lors du chargement des stations de bus"
                 }
             } catch (e: Exception) {
@@ -197,7 +208,42 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
             _nearestStop.value = updatedStop
             Log.d("MapViewModel", "Station la plus proche: ${it.stopName}, distance: ${distance.toInt()}m")
+
+            // Vérifier si l'utilisateur est près de la station
+            checkIfNearStop(updatedStop, distance)
         }
+    }
+
+    /**
+     * Vérifie si l'utilisateur est près d'une station
+     * Met à jour _isNearStop si l'utilisateur est à moins de NEAR_STOP_THRESHOLD mètres
+     */
+    private fun checkIfNearStop(stop: Stop, distance: Double) {
+        if (autoNavigationEnabled && distance <= NEAR_STOP_THRESHOLD) {
+            // L'utilisateur est près de la station
+            if (_isNearStop.value?.stopId != stop.stopId) {
+                // Nouvelle station proche détectée
+                _isNearStop.value = stop
+                Log.d("MapViewModel", "Utilisateur près de la station: ${stop.stopName}, distance: ${distance.toInt()}m")
+            }
+        } else {
+            // L'utilisateur n'est pas près d'une station
+            if (_isNearStop.value != null) {
+                _isNearStop.value = null
+            }
+        }
+    }
+
+    /**
+     * Active ou désactive la navigation automatique
+     */
+    fun toggleAutoNavigation(enabled: Boolean) {
+        autoNavigationEnabled = enabled
+        if (!enabled) {
+            // Réinitialiser l'état
+            _isNearStop.value = null
+        }
+        Log.d("MapViewModel", "Navigation automatique: ${if (enabled) "activée" else "désactivée"}")
     }
 
     /**
