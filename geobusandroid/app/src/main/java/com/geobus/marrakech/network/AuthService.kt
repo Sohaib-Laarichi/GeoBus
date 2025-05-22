@@ -1,7 +1,7 @@
 package com.geobus.marrakech.network
 
 
-import AuthResponse
+import com.geobus.marrakech.model.AuthResponse
 import com.geobus.marrakech.model.LoginRequest
 import com.geobus.marrakech.model.RegisterRequest
 import retrofit2.http.Body

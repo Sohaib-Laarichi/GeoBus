@@ -7,9 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -17,7 +15,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.geobus.marrakech.R
 import com.geobus.marrakech.databinding.FragmentMapBinding
+import com.geobus.marrakech.model.BusPosition
 import com.geobus.marrakech.model.Stop
+import com.geobus.marrakech.ui.auth.AuthViewModel
 import com.geobus.marrakech.util.LocationManager
 import com.geobus.marrakech.util.MapUtils
 import com.google.android.gms.maps.GoogleMap
@@ -30,7 +30,7 @@ import com.google.android.material.snackbar.Snackbar
 private const val TAG = "MapFragment"
 
 /**
- * Fragment pour afficher la carte des stations de bus
+ * Fragment pour afficher la carte des stations de bus avec toutes les fonctionnalités
  */
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -38,12 +38,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private val binding get() = _binding!!
 
     private lateinit var viewModel: MapViewModel
+    private lateinit var authViewModel: AuthViewModel
     private lateinit var locationManager: LocationManager
 
     private var map: GoogleMap? = null
     private var userMarker: Marker? = null
     private var nearestStopMarker: Marker? = null
     private val stopMarkers = mutableListOf<Marker>()
+    private val busMarkers = mutableListOf<Marker>()
+
+    private var showBuses = true // État pour afficher/masquer les bus
 
     // Permission de localisation
     private val requestPermissionLauncher = registerForActivityResult(
@@ -66,6 +70,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     ): View {
         Log.d(TAG, "onCreateView: Fragment création de la vue")
         _binding = FragmentMapBinding.inflate(inflater, container, false)
+        // Enable options menu in this fragment
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -76,6 +82,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         // Initialiser le ViewModel
         viewModel = ViewModelProvider(this)[MapViewModel::class.java]
 
+        // Initialiser le AuthViewModel
+        authViewModel = ViewModelProvider(requireActivity())[AuthViewModel::class.java]
+
         // Initialiser le gestionnaire de localisation
         locationManager = LocationManager(requireContext())
 
@@ -83,14 +92,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        // Configurer le bouton de localisation
-        binding.fabMyLocation.setOnClickListener {
-            Log.d(TAG, "Clic sur le bouton de localisation")
-            centerOnUserLocation()
-        }
-
-        // Configurer le bouton d'itinéraire
-        configureDirectionsButton()
+        // Configurer l'interface
+        setupUI()
 
         // Observer les données
         observeViewModel()
@@ -98,92 +101,60 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     /**
-     * Configurer correctement le bouton d'itinéraire
+     * Configuration de l'interface utilisateur
      */
-    private fun configureDirectionsButton() {
-        try {
-            Log.d(TAG, "Configuration du bouton d'itinéraire")
+    private fun setupUI() {
+        // Bouton de localisation
+        binding.fabMyLocation.setOnClickListener {
+            Log.d(TAG, "Clic sur le bouton de localisation")
+            centerOnUserLocation()
+        }
 
-            // S'assurer que le bouton est visible et cliquable
-            binding.btnDirections.apply {
-                visibility = View.VISIBLE
-                isClickable = true
-                isFocusable = true
-
-                // Définir l'apparence du bouton pour qu'il ressemble à celui de la capture d'écran
-                setBackgroundResource(R.drawable.button_directions_background)
-
-                // Régler la marge si nécessaire
-                val params = layoutParams as? ViewGroup.MarginLayoutParams
-                params?.setMargins(0, 16, 0, 0)
-                layoutParams = params
-
-                // Définir le listener de clic avec un retour visuel
-                setOnClickListener { view ->
-                    Log.d(TAG, "Clic sur le bouton d'itinéraire détecté")
-                    view.isPressed = true  // Effet visuel
-
-                    try {
-                        val nearestStop = viewModel.nearestStop.value
-                        if (nearestStop == null) {
-                            Log.e(TAG, "Aucune station proche trouvée")
-                            Snackbar.make(
-                                binding.root,
-                                "Aucune station proche n'a été trouvée",
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                            view.isPressed = false
-                            return@setOnClickListener
-                        }
-
-                        Log.d(TAG, "Station trouvée: ${nearestStop.stopName}, id=${nearestStop.stopId}")
-
-                        // Vérifier la localisation
-                        val location = locationManager.locationLiveData.value
-                        if (location != null) {
-                            Log.d(TAG, "Localisation disponible: ${location.latitude}, ${location.longitude}")
-                            openDirectionsInGoogleMaps(location.latitude, location.longitude, nearestStop)
-                        } else {
-                            Log.w(TAG, "Localisation non disponible, utilisation de coordonnées par défaut")
-                            // Si la localisation n'est pas disponible, utiliser le centre de Marrakech comme position par défaut
-                            openDirectionsInGoogleMaps(31.6295, -7.9811, nearestStop)
-
-                            // Avertir l'utilisateur que sa position exacte n'est pas disponible
-                            Snackbar.make(
-                                binding.root,
-                                R.string.location_not_available,
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "ERREUR lors du clic sur le bouton d'itinéraire: ${e.message}", e)
-
-                        // Afficher un message d'erreur
-                        Snackbar.make(
-                            binding.root,
-                            "Erreur lors de l'ouverture de l'itinéraire: ${e.message}",
-                            Snackbar.LENGTH_LONG
-                        ).show()
-                    } finally {
-                        view.isPressed = false  // Remettre à l'état normal
-                    }
-                }
+        // Bouton d'itinéraire
+        binding.btnDirections.setOnClickListener {
+            val nearestStop = viewModel.nearestStop.value
+            if (nearestStop == null) {
+                Snackbar.make(binding.root, "Aucune station proche trouvée", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            Log.d(TAG, "Configuration du bouton d'itinéraire terminée avec succès")
-        } catch (e: Exception) {
-            Log.e(TAG, "ERREUR grave lors de la configuration du bouton d'itinéraire: ${e.message}", e)
+            val location = locationManager.locationLiveData.value
+            if (location != null) {
+                openDirectionsInGoogleMaps(location.latitude, location.longitude, nearestStop)
+            } else {
+                openDirectionsInGoogleMaps(31.6295, -7.9811, nearestStop)
+                Snackbar.make(binding.root, "Position non disponible, utilisation du centre de Marrakech", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        // Bouton pour afficher/masquer les bus
+        binding.fabToggleBuses?.apply {
+            // Définir le texte initial en fonction de l'état
+            text = if (showBuses) getString(R.string.hide_buses) else getString(R.string.show_buses)
+            setOnClickListener {
+                toggleBusDisplay()
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "onResume: Fragment visible")
+        // Démarrer le rafraîchissement des bus
+        viewModel.startPeriodicRefresh()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause: Fragment en pause")
+        // Arrêter le rafraîchissement pour économiser la batterie
+        viewModel.stopPeriodicRefresh()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         Log.d(TAG, "onDestroyView: Nettoyage des ressources")
+        viewModel.stopPeriodicRefresh()
         _binding = null
         locationManager.stopLocationUpdates()
     }
@@ -211,8 +182,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         // Vérifier les permissions de localisation
         checkLocationPermission()
 
-        // Charger les stations de bus
+        // Charger les données
         viewModel.loadStops()
+        viewModel.loadBusPositions()
     }
 
     /**
@@ -235,6 +207,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
             }
         }
 
+        // Observer les positions des bus
+        viewModel.busPositions.observe(viewLifecycleOwner) { buses ->
+            Log.d(TAG, "Mise à jour des positions de bus: ${buses.size} bus")
+            if (showBuses) {
+                displayBusMarkers(buses)
+            }
+        }
+
+        // Observer les bus pour une station spécifique
+        viewModel.busesForStop.observe(viewLifecycleOwner) { buses ->
+            Log.d(TAG, "Bus pour station: ${buses.size} bus")
+            displayBusesForStopInfo(buses)
+        }
+
         // Observer l'état de chargement
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             Log.d(TAG, "État de chargement: $isLoading")
@@ -248,6 +234,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry) {
                         viewModel.loadStops()
+                        viewModel.loadBusPositions()
                     }
                     .show()
 
@@ -380,10 +367,53 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     /**
+     * Affiche les marqueurs des bus sur la carte
+     */
+    private fun displayBusMarkers(buses: List<BusPosition>) {
+        Log.d(TAG, "displayBusMarkers: Affichage de ${buses.size} marqueurs de bus")
+        map?.let { googleMap ->
+            // Effacer les marqueurs de bus existants
+            busMarkers.forEach { it.remove() }
+            busMarkers.clear()
+
+            // Ajouter les nouveaux marqueurs de bus
+            busMarkers.addAll(
+                MapUtils.addBusMarkers(requireContext(), googleMap, buses)
+            )
+        }
+    }
+
+    /**
+     * Bascule l'affichage des bus
+     */
+    private fun toggleBusDisplay() {
+        showBuses = !showBuses
+        if (showBuses) {
+            // Réafficher les bus
+            viewModel.busPositions.value?.let { buses ->
+                displayBusMarkers(buses)
+            }
+            binding.fabToggleBuses?.apply {
+                setIconResource(R.drawable.ic_bus_visible)
+                text = getString(R.string.hide_buses)
+            }
+        } else {
+            // Masquer les bus
+            busMarkers.forEach { it.remove() }
+            busMarkers.clear()
+            binding.fabToggleBuses?.apply {
+                setIconResource(R.drawable.ic_bus_hidden)
+                text = getString(R.string.show_buses)
+            }
+        }
+    }
+
+    /**
      * Affiche les informations sur la station la plus proche
      */
     private fun displayNearestStop(stop: Stop) {
         Log.d(TAG, "displayNearestStop: Station la plus proche: ${stop.stopName}")
+
         // Mettre à jour le marqueur sur la carte
         map?.let { googleMap ->
             nearestStopMarker?.remove()
@@ -417,9 +447,33 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
             isClickable = true
         }
 
-        // Forcer un rafraîchissement du layout
-        binding.root.invalidate()
-        binding.cardNearestStop.invalidate()
+        // Charger les bus pour cette station
+        viewModel.loadBusesForStop(stop.stopId)
+    }
+
+    /**
+     * Affiche les informations sur les bus se dirigeant vers une station
+     */
+    private fun displayBusesForStopInfo(buses: List<BusPosition>) {
+        if (buses.isEmpty()) {
+            Log.d(TAG, "Aucun bus trouvé pour cette station")
+            return
+        }
+
+        // Trier les bus par temps d'arrivée estimé
+        val sortedBuses = buses.sortedBy { it.minutesUntilArrival ?: Int.MAX_VALUE }
+
+        // Afficher les informations du prochain bus
+        val nextBus = sortedBuses.firstOrNull()
+        nextBus?.let { bus ->
+            // Vous pouvez ajouter des éléments UI pour afficher ces informations
+            Log.d(TAG, "Prochain bus: ${bus.busId} - Ligne ${bus.ligne}")
+            bus.minutesUntilArrival?.let { minutes ->
+                Log.d(TAG, "Arrivée dans: $minutes minutes")
+                // Afficher dans un TextView si vous en ajoutez un
+                // binding.tvNextBusInfo.text = "Prochain bus: Ligne ${bus.ligne} dans $minutes min"
+            }
+        }
     }
 
     /**
@@ -430,6 +484,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         if (marker == userMarker) {
             Log.d(TAG, "Clic sur le marqueur de l'utilisateur, ignoré")
             return false
+        }
+
+        // Vérifier si c'est un marqueur de bus
+        val busId = marker.tag as? String
+        if (busId != null) {
+            Log.d(TAG, "Clic sur le marqueur du bus $busId")
+            // Afficher les informations du bus
+            showBusInfo(busId)
+            return true
         }
 
         // Récupérer l'ID de la station
@@ -455,6 +518,25 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         )
 
         return true
+    }
+
+    /**
+     * Affiche les informations d'un bus
+     */
+    private fun showBusInfo(busId: String) {
+        val bus = viewModel.busPositions.value?.find { it.busId == busId }
+        bus?.let {
+            val message = buildString {
+                append("Bus ${it.busId}\n")
+                append("Ligne: ${it.ligne}\n")
+                it.destination?.let { dest -> append("Destination: $dest\n") }
+                it.minutesUntilArrival?.let { minutes ->
+                    append("Arrivée dans: $minutes min")
+                }
+            }
+
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        }
     }
 
     /**
@@ -521,5 +603,46 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                 ).show()
             }
         }
+    }
+
+    /**
+     * Inflate the options menu
+     */
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    /**
+     * Handle menu item selection
+     */
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_logout -> {
+                logout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    /**
+     * Logout the user and navigate to login screen
+     */
+    private fun logout() {
+        Log.d(TAG, "logout: Déconnexion de l'utilisateur")
+
+        // Call logout in AuthViewModel
+        authViewModel.logout()
+
+        // Show confirmation message
+        Snackbar.make(
+            binding.root,
+            "Vous avez été déconnecté avec succès",
+            Snackbar.LENGTH_SHORT
+        ).show()
+
+        // Navigate to login screen
+        findNavController().navigate(R.id.loginFragment)
     }
 }

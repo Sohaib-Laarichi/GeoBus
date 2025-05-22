@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 class StopRepository {
 
     private val stopService = ApiClient.stopService
+    private val apiService = ApiClient.getApiService()
 
     /**
      * Récupère toutes les stations de bus à Marrakech
@@ -20,6 +21,23 @@ class StopRepository {
     suspend fun getAllStopsInMarrakech(): List<Stop>? = withContext(Dispatchers.IO) {
         try {
             val response = stopService.getAllStopsInMarrakech()
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Récupère une station par son ID
+     * @return La station ou null en cas d'erreur
+     */
+    suspend fun getStopById(stopId: Long): Stop? = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.getStopById(stopId)
             if (response.isSuccessful) {
                 response.body()
             } else {

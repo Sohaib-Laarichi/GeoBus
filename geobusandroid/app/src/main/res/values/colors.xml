@@ -18,4 +18,9 @@
     <color name="bus_stop_marker">#FF5722</color>
     <color name="current_location_marker">#2196F3</color>
     <color name="nearest_stop_marker">#4CAF50</color>
+    <color name="success_color">#4CAF50</color>
+    <color name="warning_color">#FF9800</color>
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#757575</color>
+
 </resources>

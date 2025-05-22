@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.geobus.marrakech">
 
     <!-- Permissions Internet pour appeler l'API -->
@@ -10,30 +11,57 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <!-- Permission pour vibrer (notifications) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- Fonctionnalités requises -->
+    <uses-feature
+        android:name="android.hardware.location"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
+
     <application
         android:name=".GeoBusApplication"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GeoBusMarrakech"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
 
-        <!-- Clé API Google Maps -->
+        <!-- Clé API Google Maps - IMPORTANT: Remplacez par votre vraie clé -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAOh3ts057usH9CeS8B_G9uPUT606_PgRQ" />
 
+        <!-- Configuration pour Google Play Services -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.GeoBusMarrakech">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Service pour les mises à jour de localisation en arrière-plan (optionnel) -->
+        <service
+            android:name=".service.LocationService"
+            android:enabled="true"
+            android:exported="false" />
+
     </application>
 
 </manifest>

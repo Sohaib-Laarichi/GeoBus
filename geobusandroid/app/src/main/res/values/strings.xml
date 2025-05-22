@@ -1,49 +1,62 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- res/values/strings.xml - Version complète -->
 <resources>
+    <!-- Nom de l'application -->
     <string name="app_name">GeoBus Marrakech</string>
 
-    <!-- Messages généraux -->
-    <string name="loading">Chargement...</string>
-    <string name="error_loading_stops">Erreur lors du chargement des arrêts de bus</string>
-    <string name="retry">Réessayer</string>
-    <string name="no_internet">Pas de connexion Internet</string>
-
-    <!-- Carte -->
-    <string name="map_title">Stations de Bus Marrakech</string>
-    <string name="location_permission_required">L\'autorisation de localisation est nécessaire pour afficher votre position</string>
-    <string name="grant_permission">Autoriser</string>
-    <string name="nearest_stop">Arrêt le plus proche : %1$s</string>
-    <string name="distance_meters">Distance : %1$d m</string>
-    <string name="walking_time_minutes">Temps de marche : %1$d min</string>
-    <string name="finding_nearest_stop">Recherche de l\'arrêt le plus proche...</string>
-    <string name="location_not_available">Localisation non disponible</string>
-
-    <!-- Informations d'arrêt -->
-    <string name="stop_details">Détails de l\'arrêt</string>
-    <string name="directions">ITINÉRAIRE</string>
-    <string name="show_all_stops">Tous les arrêts</string>
-    <string name="center_on_me">Ma position</string>
-
-    <!-- Messages d'erreur spécifiques -->
-    <string name="error_opening_maps">Impossible d\'ouvrir Google Maps. Vérifiez que l\'application est installée.</string>
-    <string name="error_no_maps_app">Impossible d\'ouvrir l\'itinéraire. Aucune application compatible.</string>
-    <string name="error_no_nearest_stop">Aucune station proche n\'a été trouvée</string>
-
-    <!-- Menu -->
-    <string name="menu_refresh">Actualiser</string>
-    <string name="menu_settings">Paramètres</string>
-    <string name="menu_about">À propos</string>
-
-    <!-- Login et Inscription -->
-    <string name="login_subtitle">Connectez-vous pour accéder à votre compte</string>
+    <!-- Strings pour l'authentification -->
+    <string name="login">Connexion</string>
+    <string name="register">Inscription</string>
+    <string name="name">Nom d\'utilisateur</string>
     <string name="email">Email</string>
     <string name="password">Mot de passe</string>
-    <string name="login">Se connecter</string>
-    <string name="no_account_prompt">Vous n\'avez pas de compte ?</string>
-    <string name="register">S\'inscrire</string>
+    <string name="confirm_password">Confirmer le mot de passe</string>
+    <string name="login_subtitle">Connectez-vous pour une expérience personnalisée</string>
+    <string name="login_explanation">La connexion vous permet de sauvegarder vos arrêts favoris, recevoir des notifications en temps réel et accéder à votre historique de trajets.</string>
+    <string name="no_account_prompt">Pas encore de compte ?</string>
+    <string name="have_account_prompt">Déjà un compte ?</string>
+
+    <!-- Strings pour la localisation -->
+    <string name="location_permission_required">Permission de localisation requise pour afficher votre position</string>
+    <string name="grant_permission">Accorder</string>
+    <string name="location_not_available">Position non disponible</string>
+    <string name="center_on_me">Centrer sur ma position</string>
+
+    <!-- Strings pour les distances et temps -->
+    <string name="distance_meters">Distance : %d m</string>
+    <string name="walking_time_minutes">Temps de marche : %d min</string>
+    <string name="directions">Itinéraire</string>
+    <string name="retry">Réessayer</string>
+
+    <!-- Strings pour les bus -->
+
+    <string name="bus_icon">Icône bus</string>
+
+
+    <string name="no_buses_found">Aucun bus trouvé pour cette station</string>
+    <string name="bus_line">Ligne %s</string>
+
+    <string name="bus_arriving_now">Arrivé</string>
+    <string name="bus_arriving_soon">Bientôt</string>
+
+    <!-- Strings pour les erreurs -->
     <string name="error_field_required">Ce champ est obligatoire</string>
     <string name="error_passwords_dont_match">Les mots de passe ne correspondent pas</string>
-    <string name="have_account_prompt">Vous avez déjà un compte ?</string>
-    <string name="name">Nom</string>
-    <string name="confirm_password">Confirmer le mot de passe</string>
+    <string name="error_loading_stops">Erreur lors du chargement des stations</string>
+    <string name="error_loading_buses">Erreur lors du chargement des bus</string>
+    <string name="error_network">Erreur de connexion réseau</string>
+
+    <string name="toggle_buses">Afficher/Masquer les bus</string>
+    <string name="show_buses">Afficher les bus</string>
+    <string name="hide_buses">Masquer les bus</string>
+
+    <!-- Strings pour la navigation -->
+    <string name="map_title">Carte</string>
+    <string name="stop_details">Détails de la station</string>
+
+    <!-- Messages d'information -->
+    <string name="loading">Chargement...</string>
+    <string name="no_internet">Pas de connexion Internet</string>
+    <string name="try_again">Réessayer</string>
+    <string name="bus_count">%d bus disponibles</string>
+    <string name="next_bus_in_minutes">Prochain bus dans %d min</string>
 </resources>

@@ -6,33 +6,112 @@ import android.graphics.Canvas
 import android.location.Location
 import androidx.core.content.ContextCompat
 import com.geobus.marrakech.R
+import com.geobus.marrakech.model.BusPosition
 import com.geobus.marrakech.model.Stop
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
 
 /**
- * Classe utilitaire pour les opérations liées à Google Maps
+ * Utilitaires pour la gestion de Google Maps
  */
 object MapUtils {
 
-    /**
-     * Position par défaut (centre de Marrakech)
-     */
     val DEFAULT_MARRAKECH_LOCATION = LatLng(31.6295, -7.9811)
+    const val DEFAULT_ZOOM = 12f
+    const val DETAIL_ZOOM = 15f
 
     /**
-     * Niveau de zoom par défaut pour voir la ville
+     * Centre la carte sur une localisation donnée
      */
-    const val DEFAULT_ZOOM = 13f
+    fun centerMapOnLocation(map: GoogleMap, location: LatLng, zoom: Float = DEFAULT_ZOOM) {
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom))
+    }
 
     /**
-     * Niveau de zoom rapproché pour voir le détail
+     * Ajoute un marqueur pour la position de l'utilisateur
      */
-    const val DETAIL_ZOOM = 16f
+    fun addUserLocationMarker(context: Context, map: GoogleMap, location: Location): Marker? {
+        val latLng = LatLng(location.latitude, location.longitude)
+        return map.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title("Ma position")
+                .icon(getBitmapFromVector(context, R.drawable.ic_my_location))
+        )
+    }
 
     /**
-     * Crée une icône de marqueur à partir d'un drawable vectoriel
+     * Ajoute des marqueurs pour toutes les stations
+     */
+    fun addStopMarkers(context: Context, map: GoogleMap, stops: List<Stop>): List<Marker> {
+        return stops.mapNotNull { stop ->
+            map.addMarker(
+                MarkerOptions()
+                    .position(LatLng(stop.latitude, stop.longitude))
+                    .title(stop.stopName)
+                    .icon(getBitmapFromVector(context, R.drawable.ic_bus_stop))
+            )?.also { marker ->
+                marker.tag = stop.stopId
+            }
+        }
+    }
+
+    /**
+     * Ajoute un marqueur spécial pour la station la plus proche
+     */
+    fun addNearestStopMarker(context: Context, map: GoogleMap, stop: Stop): Marker? {
+        return map.addMarker(
+            MarkerOptions()
+                .position(LatLng(stop.latitude, stop.longitude))
+                .title("Station la plus proche: ${stop.stopName}")
+                .icon(getBitmapFromVector(context, R.drawable.ic_nearest_stop))
+        )
+    }
+
+    /**
+     * Ajoute des marqueurs pour les bus avec style amélioré
+     */
+    fun addBusMarkers(context: Context, map: GoogleMap, buses: List<BusPosition>): List<Marker> {
+        return buses.mapNotNull { bus ->
+            // Créer un titre plus informatif
+            val title = "Bus ${bus.busId} - Ligne ${bus.ligne}"
+
+            // Créer un snippet avec plus d'informations
+            val snippet = buildString {
+                append("Destination: ${bus.getDisplayDestination()}")
+                bus.minutesUntilArrival?.let { minutes ->
+                    append("\nArrivée: ")
+                    when {
+                        minutes <= 1 -> append("Imminent")
+                        else -> append("Dans $minutes min")
+                    }
+                }
+                bus.distanceToStop?.let { distance ->
+                    val distanceText = if (distance < 1000) {
+                        "${distance.toInt()} m"
+                    } else {
+                        String.format("%.1f", distance / 1000) + " km"
+                    }
+                    append("\nDistance: $distanceText")
+                }
+            }
+
+            map.addMarker(
+                MarkerOptions()
+                    .position(LatLng(bus.latitude, bus.longitude))
+                    .title(title)
+                    .snippet(snippet)
+                    .icon(getBitmapFromVector(context, R.drawable.ic_bus))
+                    .zIndex(2.0f)  // Mettre les bus au-dessus des autres marqueurs
+            )?.also { marker ->
+                marker.tag = bus.busId
+            }
+        }
+    }
+
+    /**
+     * Convertit un drawable vectoriel en BitmapDescriptor
      */
     fun getBitmapFromVector(context: Context, vectorResId: Int): BitmapDescriptor {
         val vectorDrawable = ContextCompat.getDrawable(context, vectorResId)
@@ -45,103 +124,5 @@ object MapUtils {
         val canvas = Canvas(bitmap)
         vectorDrawable.draw(canvas)
         return BitmapDescriptorFactory.fromBitmap(bitmap)
-    }
-
-    /**
-     * Centre la carte sur une position
-     */
-    fun centerMapOnLocation(googleMap: GoogleMap, location: LatLng, zoom: Float = DEFAULT_ZOOM) {
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoom))
-    }
-
-    /**
-     * Ajoute un marqueur pour la position actuelle de l'utilisateur
-     */
-    fun addUserLocationMarker(
-        context: Context,
-        googleMap: GoogleMap,
-        location: Location
-    ): Marker {
-        val latLng = LatLng(location.latitude, location.longitude)
-        val markerOptions = MarkerOptions()
-            .position(latLng)
-            .title("Ma position")
-            .icon(getBitmapFromVector(context, R.drawable.ic_my_location))
-            .zIndex(2.0f) // Afficher au-dessus des autres marqueurs
-
-        return googleMap.addMarker(markerOptions)!!
-    }
-
-    /**
-     * Ajoute des marqueurs pour toutes les stations de bus
-     */
-    fun addStopMarkers(
-        context: Context,
-        googleMap: GoogleMap,
-        stops: List<Stop>
-    ): List<Marker> {
-        val markers = mutableListOf<Marker>()
-
-        stops.forEach { stop ->
-            val latLng = LatLng(stop.latitude, stop.longitude)
-            val markerOptions = MarkerOptions()
-                .position(latLng)
-                .title(stop.stopName)
-                .snippet("Station de bus")
-                .icon(getBitmapFromVector(context, R.drawable.ic_bus_stop))
-                .zIndex(1.0f)
-
-            val marker = googleMap.addMarker(markerOptions)!!
-            marker.tag = stop.stopId
-            markers.add(marker)
-        }
-
-        return markers
-    }
-
-    /**
-     * Ajoute un marqueur spécial pour la station la plus proche
-     */
-    fun addNearestStopMarker(
-        context: Context,
-        googleMap: GoogleMap,
-        stop: Stop
-    ): Marker {
-        val latLng = LatLng(stop.latitude, stop.longitude)
-        val markerOptions = MarkerOptions()
-            .position(latLng)
-            .title(stop.stopName)
-            .snippet("Station la plus proche")
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-            .zIndex(1.5f) // Au-dessus des stations normales mais sous l'utilisateur
-
-        val marker = googleMap.addMarker(markerOptions)!!
-        marker.tag = stop.stopId
-        return marker
-    }
-
-    /**
-     * Formate la distance en chaîne de caractères lisible
-     */
-    fun formatDistance(distanceMeters: Double): String {
-        return when {
-            distanceMeters < 1000 -> "${distanceMeters.toInt()} m"
-            else -> String.format("%.1f km", distanceMeters / 1000)
-        }
-    }
-
-    /**
-     * Formate le temps de marche en chaîne de caractères lisible
-     */
-    fun formatWalkingTime(walkingTimeMinutes: Double): String {
-        return when {
-            walkingTimeMinutes < 1 -> "moins d'une minute"
-            walkingTimeMinutes < 60 -> "${walkingTimeMinutes.toInt()} min"
-            else -> {
-                val hours = walkingTimeMinutes.toInt() / 60
-                val mins = walkingTimeMinutes.toInt() % 60
-                if (mins > 0) "$hours h $mins min" else "$hours h"
-            }
-        }
     }
 }

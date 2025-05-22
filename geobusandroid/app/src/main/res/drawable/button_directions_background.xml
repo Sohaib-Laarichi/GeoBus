@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-
-    <!-- Couleur de fond du bouton (bleu comme dans la capture d'écran) -->
-    <solid android:color="#4258e8" />
-
-    <!-- Arrondi des coins comme sur l'image -->
+    <solid android:color="?attr/colorPrimary" />
     <corners android:radius="4dp" />
-
-    <!-- Ombrage léger pour donner un effet d'élévation -->
-    <padding
-        android:left="16dp"
-        android:top="8dp"
-        android:right="16dp"
-        android:bottom="8dp" />
-
 </shape>

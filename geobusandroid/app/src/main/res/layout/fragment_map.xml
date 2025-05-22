@@ -25,6 +25,21 @@
         android:layout_margin="16dp"
         android:contentDescription="@string/center_on_me"
         android:src="@drawable/ic_my_location"
+        app:layout_constraintBottom_toTopOf="@id/fabToggleBuses"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Bouton amélioré pour afficher/masquer les bus -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabToggleBuses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/toggle_buses"
+        android:text="@string/toggle_buses"
+        android:textColor="@android:color/white"
+        app:icon="@drawable/ic_bus_visible"
+        app:iconTint="@android:color/white"
+        app:backgroundTint="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -40,7 +55,7 @@
         android:focusable="true"
         app:cardElevation="4dp"
         app:layout_constraintBottom_toTopOf="@id/fabMyLocation"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fabMyLocation"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible">
 
@@ -81,7 +96,22 @@
                 app:layout_constraintTop_toBottomOf="@id/tvDistance"
                 tools:text="Temps de marche : 2 min" />
 
-            <!-- Bouton d'itinéraire modifié pour ressembler à celui de la capture d'écran -->
+            <!-- Informations sur le prochain bus (nouveau) -->
+            <TextView
+                android:id="@+id/tvNextBusInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="?android:attr/textColorSecondary"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvWalkingTime"
+                tools:text="Prochain bus: Ligne 1 dans 5 min"
+                tools:visibility="visible" />
+
+            <!-- Bouton d'itinéraire -->
             <Button
                 android:id="@+id/btnDirections"
                 android:layout_width="match_parent"
@@ -97,7 +127,7 @@
                 android:elevation="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvWalkingTime" />
+                app:layout_constraintTop_toBottomOf="@id/tvNextBusInfo" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

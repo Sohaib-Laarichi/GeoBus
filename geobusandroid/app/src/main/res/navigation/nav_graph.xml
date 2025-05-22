@@ -3,48 +3,81 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/mapFragment">
 
     <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.geobus.marrakech.ui.auth.LoginFragment"
-        android:label="@string/login"
-        tools:layout="@layout/fragment_login">
-        <action
-            android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_mapFragment"
-            app:destination="@id/mapFragment" />
-    </fragment>
+        android:id="@+id/mapFragment"
+        android:name="com.geobus.marrakech.ui.map.MapFragment"
+        android:label="Carte"
+        tools:layout="@layout/fragment_map">
 
+        <action
+            android:id="@+id/action_mapFragment_to_stopDetailFragment"
+            app:destination="@id/stopDetailFragment" />
+
+        <!-- Arguments pour recevoir les coordonnées de navigation -->
+        <argument
+            android:name="targetLat"
+            app:argType="float"
+            android:defaultValue="0.0" />
+        <argument
+            android:name="targetLon"
+            app:argType="float"
+            android:defaultValue="0.0" />
+        <argument
+            android:name="targetName"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="stopId"
+            app:argType="long"
+            android:defaultValue="0L" />
+
+    </fragment>
+    <!-- Add this fragment definition to your nav_graph.xml -->
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.geobus.marrakech.ui.auth.RegisterFragment"
-        android:label="@string/register"
+        android:label="Register"
         tools:layout="@layout/fragment_register">
+        <!-- Optional: Add action to navigate back to login -->
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <!-- Action to navigate to map after successful registration -->
         <action
             android:id="@+id/action_registerFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/mapFragment"
-        android:name="com.geobus.marrakech.ui.map.MapFragment"
-        android:label="@string/map_title"
-        tools:layout="@layout/fragment_map">
-        <action
-            android:id="@+id/action_mapFragment_to_stopDetailFragment"
-            app:destination="@id/stopDetailFragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/stopDetailFragment"
         android:name="com.geobus.marrakech.ui.stopdetail.StopDetailFragment"
-        android:label="@string/stop_details"
+        android:label="Détails de la station"
         tools:layout="@layout/fragment_stop_detail">
+
         <argument
             android:name="stopId"
             app:argType="long" />
+
+        <!-- Action pour retourner à la carte avec navigation -->
+        <action
+            android:id="@+id/action_stop_detail_to_map"
+            app:destination="@id/mapFragment" />
+
     </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.geobus.marrakech.ui.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
 </navigation>
