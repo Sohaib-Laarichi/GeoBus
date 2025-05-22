@@ -1,29 +1,33 @@
-package com.geobus.marrakech.model
-
 /**
  * Réponse d'authentification du serveur
+ * CORRECTION: Structure mise à jour pour correspondre au backend
  */
 data class AuthResponse(
+    val userId: Long?,
+    val username: String?,
+    val email: String?,
+    val token: String?,
     val success: Boolean,
-    val message: String? = null,
-    val user: User? = null
+    val message: String?
 ) {
     companion object {
-        /**
-         * Crée une réponse de succès avec les informations de l'utilisateur
-         */
-        fun success(id: Long, name: String, email: String): AuthResponse {
+        fun success(userId: Long, username: String, email: String, token: String): AuthResponse {
             return AuthResponse(
+                userId = userId,
+                username = username,
+                email = email,
+                token = token,
                 success = true,
-                user = User(id, name, email)
+                message = "Authentification réussie"
             )
         }
 
-        /**
-         * Crée une réponse d'erreur avec un message
-         */
         fun error(message: String): AuthResponse {
             return AuthResponse(
+                userId = null,
+                username = null,
+                email = null,
+                token = null,
                 success = false,
                 message = message
             )

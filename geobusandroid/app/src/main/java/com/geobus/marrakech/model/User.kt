@@ -1,17 +1,9 @@
-package com.geobus.marrakech.model
-
 /**
- * Modèle représentant un utilisateur de l'application
+ * Modèle utilisateur corrigé
  */
 data class User(
     val id: Long? = null,
-    val name: String,
+    val username: String,  // Changé de 'name' à 'username'
     val email: String,
-    val password: String? = null
-) {
-    /**
-     * Constructeur secondaire pour créer un utilisateur sans mot de passe
-     * Utile pour afficher les informations de l'utilisateur sans exposer le mot de passe
-     */
-    constructor(id: Long, name: String, email: String) : this(id, name, email, null)
-}
+    val token: String? = null
+)

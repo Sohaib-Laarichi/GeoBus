@@ -12,7 +12,7 @@ import com.geobus.marrakech.databinding.FragmentRegisterBinding
 import com.google.android.material.snackbar.Snackbar
 
 /**
- * Fragment pour l'enregistrement des utilisateurs
+ * Fragment pour l'enregistrement des utilisateurs - CORRIGÉ
  */
 class RegisterFragment : Fragment() {
 
@@ -82,10 +82,11 @@ class RegisterFragment : Fragment() {
     }
 
     /**
-     * Enregistrement de l'utilisateur
+     * Enregistrement de l'utilisateur - CORRIGÉ
      */
     private fun register() {
-        val name = binding.etName.text.toString().trim()
+        // CORRECTION: Récupération des champs avec les bons noms
+        val username = binding.etName.text.toString().trim()  // etName devient username
         val email = binding.etEmail.text.toString().trim()
         val password = binding.etPassword.text.toString().trim()
         val confirmPassword = binding.etConfirmPassword.text.toString().trim()
@@ -93,7 +94,7 @@ class RegisterFragment : Fragment() {
         // Validation des champs
         var isValid = true
 
-        if (name.isEmpty()) {
+        if (username.isEmpty()) {
             binding.tilName.error = getString(R.string.error_field_required)
             isValid = false
         } else {
@@ -128,7 +129,7 @@ class RegisterFragment : Fragment() {
             return
         }
 
-        // Enregistrement
-        viewModel.register(name, email, password)
+        // CORRECTION: Passer username au lieu de name
+        viewModel.register(username, email, password)
     }
 }

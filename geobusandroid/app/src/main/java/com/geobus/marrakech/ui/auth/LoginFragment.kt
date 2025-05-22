@@ -12,7 +12,7 @@ import com.geobus.marrakech.databinding.FragmentLoginBinding
 import com.google.android.material.snackbar.Snackbar
 
 /**
- * Fragment pour la connexion des utilisateurs
+ * Fragment pour la connexion des utilisateurs - CORRIGÉ
  */
 class LoginFragment : Fragment() {
 
@@ -82,14 +82,15 @@ class LoginFragment : Fragment() {
     }
 
     /**
-     * Connexion de l'utilisateur
+     * Connexion de l'utilisateur - CORRIGÉ
      */
     private fun login() {
-        val email = binding.etEmail.text.toString().trim()
+        // CORRECTION: Utilise username au lieu d'email
+        val username = binding.etEmail.text.toString().trim()  // Le champ s'appelle etEmail mais contient le username
         val password = binding.etPassword.text.toString().trim()
 
         // Validation des champs
-        if (email.isEmpty()) {
+        if (username.isEmpty()) {
             binding.tilEmail.error = getString(R.string.error_field_required)
             return
         } else {
@@ -103,7 +104,7 @@ class LoginFragment : Fragment() {
             binding.tilPassword.error = null
         }
 
-        // Connexion
-        viewModel.login(email, password)
+        // CORRECTION: Passer username au lieu d'email
+        viewModel.login(username, password)
     }
 }

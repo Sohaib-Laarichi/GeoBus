@@ -1,16 +1,17 @@
 package com.geobus.marrakech.ui.auth
 
+import User
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.geobus.marrakech.model.User
+
 import com.geobus.marrakech.repository.AuthRepository
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel pour gérer l'authentification des utilisateurs
+ * ViewModel pour gérer l'authentification des utilisateurs - CORRIGÉ
  */
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -34,24 +35,32 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Enregistre un nouvel utilisateur
-     * 
-     * @param name Nom de l'utilisateur
+     * Enregistre un nouvel utilisateur - CORRIGÉ
+     *
+     * @param username Nom d'utilisateur (changé de name à username)
      * @param email Email de l'utilisateur
      * @param password Mot de passe de l'utilisateur
      */
-    fun register(name: String, email: String, password: String) {
+    fun register(username: String, email: String, password: String) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
 
             try {
-                val response = repository.register(name, email, password)
-                
-                if (response.success && response.user != null) {
+                val response = repository.register(username, email, password)
+
+                if (response.success && response.username != null && response.email != null) {
+                    // CORRECTION: Créer l'utilisateur avec les bonnes données
+                    val user = User(
+                        id = response.userId,
+                        username = response.username,
+                        email = response.email,
+                        token = response.token
+                    )
+
                     // Sauvegarder l'utilisateur connecté
-                    repository.saveLoggedInUser(response.user)
-                    _currentUser.value = response.user
+                    repository.saveLoggedInUser(user)
+                    _currentUser.value = user
                 } else {
                     _errorMessage.value = response.message ?: "Erreur lors de l'enregistrement"
                 }
@@ -64,23 +73,31 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Connecte un utilisateur existant
-     * 
-     * @param email Email de l'utilisateur
+     * Connecte un utilisateur existant - CORRIGÉ
+     *
+     * @param username Nom d'utilisateur (changé d'email à username)
      * @param password Mot de passe de l'utilisateur
      */
-    fun login(email: String, password: String) {
+    fun login(username: String, password: String) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
 
             try {
-                val response = repository.login(email, password)
-                
-                if (response.success && response.user != null) {
+                val response = repository.login(username, password)
+
+                if (response.success && response.username != null && response.email != null) {
+                    // CORRECTION: Créer l'utilisateur avec les bonnes données
+                    val user = User(
+                        id = response.userId,
+                        username = response.username,
+                        email = response.email,
+                        token = response.token
+                    )
+
                     // Sauvegarder l'utilisateur connecté
-                    repository.saveLoggedInUser(response.user)
-                    _currentUser.value = response.user
+                    repository.saveLoggedInUser(user)
+                    _currentUser.value = user
                 } else {
                     _errorMessage.value = response.message ?: "Identifiants invalides"
                 }

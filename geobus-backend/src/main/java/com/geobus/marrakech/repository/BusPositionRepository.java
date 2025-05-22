@@ -30,4 +30,20 @@ public interface BusPositionRepository extends JpaRepository<BusPosition, Long> 
      * @return Dernière position connue
      */
     BusPosition findFirstByBusIdOrderByTimestampDesc(String busId);
+
+    /**
+     * Trouve les positions après une date donnée
+     *
+     * @param since Date limite
+     * @return Liste des positions récentes
+     */
+    List<BusPosition> findByTimestampAfter(LocalDateTime since);
+
+    /**
+     * Trouve les positions avant une date donnée (pour le nettoyage)
+     *
+     * @param cutoff Date limite
+     * @return Liste des anciennes positions
+     */
+    List<BusPosition> findByTimestampBefore(LocalDateTime cutoff);
 }

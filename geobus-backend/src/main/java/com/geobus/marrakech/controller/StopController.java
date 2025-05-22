@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ import com.geobus.marrakech.service.StopService;
  */
 @RestController
 @RequestMapping("/stops")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class StopController {
 
     @Autowired
@@ -30,8 +32,12 @@ public class StopController {
      */
     @GetMapping("/marrakech")
     public ResponseEntity<List<StopDTO>> getAllStopsInMarrakech() {
-        List<StopDTO> stops = stopService.getAllStopsInMarrakech();
-        return ResponseEntity.ok(stops);
+        try {
+            List<StopDTO> stops = stopService.getAllStopsInMarrakech();
+            return ResponseEntity.ok(stops);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**
@@ -46,11 +52,15 @@ public class StopController {
             @RequestParam("lat") Double lat,
             @RequestParam("lon") Double lon) {
 
-        StopDTO nearestStop = stopService.getNearestStop(lat, lon);
-        if (nearestStop == null) {
-            return ResponseEntity.notFound().build();
+        try {
+            StopDTO nearestStop = stopService.getNearestStop(lat, lon);
+            if (nearestStop == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(nearestStop);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.ok(nearestStop);
     }
 
     /**
@@ -67,7 +77,22 @@ public class StopController {
             @RequestParam("userLon") Double userLon,
             @RequestParam("stopId") Long stopId) {
 
-        TimeEstimationDTO timeEstimation = stopService.getTimeToStop(userLat, userLon, stopId);
-        return ResponseEntity.ok(timeEstimation);
+        try {
+            TimeEstimationDTO timeEstimation = stopService.getTimeToStop(userLat, userLon, stopId);
+            if (timeEstimation == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(timeEstimation);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Endpoint simple pour tester l'accès aux stations
+     */
+    @GetMapping("/test")
+    public ResponseEntity<String> testStopsEndpoint() {
+        return ResponseEntity.ok("Endpoint des stations accessible !");
     }
 }

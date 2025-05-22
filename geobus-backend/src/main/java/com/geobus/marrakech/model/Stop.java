@@ -1,10 +1,6 @@
 package com.geobus.marrakech.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -23,27 +19,35 @@ public class Stop {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "stop_id")
     private Long stopId;
 
     @NotBlank
+    @Column(name = "stop_name", nullable = false)
     private String stopName;
 
     @NotNull
+    @Column(name = "latitude", nullable = false)
     private Double latitude;
 
     @NotNull
+    @Column(name = "longitude", nullable = false)
     private Double longitude;
 
     @NotBlank
+    @Column(name = "ville", nullable = false)
     private String ville;
+
+    // Champs transients pour les calculs de distance
+    @Transient
+    private Double distance;
+
+    @Transient
+    private Double walkingTimeMinutes;
 
     /**
      * Calcule la distance entre cette station et les coordonnées données
      * en utilisant la formule de Haversine (distance sur la surface d'une sphère)
-     *
-     * @param lat Latitude du point à comparer
-     * @param lon Longitude du point à comparer
-     * @return Distance en mètres
      */
     public double distanceTo(double lat, double lon) {
         final int R = 6371; // Rayon de la Terre en km
@@ -61,10 +65,6 @@ public class Stop {
     /**
      * Estime le temps nécessaire pour marcher jusqu'à cette station
      * en considérant une vitesse moyenne de marche de 5 km/h
-     *
-     * @param lat Latitude du point de départ
-     * @param lon Longitude du point de départ
-     * @return Temps estimé en minutes
      */
     public double estimateWalkingTime(double lat, double lon) {
         double distance = distanceTo(lat, lon);

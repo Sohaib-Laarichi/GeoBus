@@ -1,23 +1,20 @@
 package com.geobus.marrakech.model
 
 /**
- * Classe de base pour les requêtes d'authentification
- */
-sealed class AuthRequest
-
-/**
  * Requête pour l'enregistrement d'un nouvel utilisateur
+ * CORRECTION: Utilise 'username' au lieu de 'name' pour correspondre au backend
  */
 data class RegisterRequest(
-    val name: String,
+    val username: String,  // Changé de 'name' à 'username'
     val email: String,
     val password: String
-) : AuthRequest()
+)
 
 /**
  * Requête pour la connexion d'un utilisateur existant
+ * CORRECTION: Utilise 'username' au lieu de 'email' pour correspondre au backend
  */
 data class LoginRequest(
-    val email: String,
+    val username: String,  // Changé de 'email' à 'username'
     val password: String
-) : AuthRequest()
+)
