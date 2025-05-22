@@ -16,7 +16,7 @@
         <item name="android:statusBarColor">@color/primary_dark</item>
 
         <!-- Window background -->
-        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:windowBackground">@drawable/gradient_background</item>
 
         <!-- Enable activity transitions -->
         <item name="android:windowActivityTransitions">true</item>
@@ -34,6 +34,9 @@
 
         <!-- Card style -->
         <item name="cardViewStyle">@style/Widget.GeoBus.CardView</item>
+
+        <!-- Navigation bar color -->
+        <item name="android:navigationBarColor">@color/primary_dark</item>
     </style>
 
     <!-- Text styles -->
@@ -72,14 +75,16 @@
         <item name="android:textSize">14sp</item>
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
         <item name="android:letterSpacing">0.0892</item>
         <item name="android:textAllCaps">false</item>
-        <item name="cornerRadius">8dp</item>
+        <item name="cornerRadius">10dp</item>
         <item name="rippleColor">@color/ripple_color</item>
-        <item name="elevation">2dp</item>
+        <item name="elevation">4dp</item>
         <item name="android:stateListAnimator">@animator/button_state_list_animator</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:background">@drawable/button_background</item>
     </style>
 
     <!-- Outlined Button Style -->
@@ -87,36 +92,47 @@
         <item name="android:textColor">@color/primary</item>
         <item name="android:textSize">14sp</item>
         <item name="strokeColor">@color/primary</item>
-        <item name="strokeWidth">1dp</item>
-        <item name="cornerRadius">8dp</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="cornerRadius">10dp</item>
         <item name="rippleColor">@color/ripple_color</item>
     </style>
 
     <!-- Card styles -->
     <style name="Widget.GeoBus.CardView" parent="Widget.MaterialComponents.CardView">
-        <item name="cardElevation">4dp</item>
-        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">6dp</item>
+        <item name="cardCornerRadius">16dp</item>
         <item name="contentPadding">16dp</item>
         <item name="cardBackgroundColor">@color/card_background</item>
         <item name="cardUseCompatPadding">true</item>
         <item name="cardPreventCornerOverlap">true</item>
         <item name="rippleColor">@color/ripple_color</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">#E0E0E0</item>
     </style>
 
     <!-- Floating Action Button Style -->
     <style name="Widget.GeoBus.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
-        <item name="backgroundTint">@color/primary</item>
+        <item name="backgroundTint">@color/accent</item>
         <item name="tint">@color/white</item>
         <item name="rippleColor">@color/ripple_color</item>
-        <item name="elevation">6dp</item>
+        <item name="elevation">8dp</item>
+        <item name="borderWidth">0dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.GeoBus.SmallComponent</item>
     </style>
 
     <!-- Extended Floating Action Button Style -->
     <style name="Widget.GeoBus.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
-        <item name="backgroundTint">@color/primary</item>
+        <item name="backgroundTint">@color/accent</item>
         <item name="android:textColor">@color/white</item>
         <item name="iconTint">@color/white</item>
         <item name="rippleColor">@color/ripple_color</item>
-        <item name="elevation">6dp</item>
+        <item name="elevation">8dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.GeoBus.SmallComponent</item>
+    </style>
+
+    <!-- Shape Appearance for Small Components -->
+    <style name="ShapeAppearance.GeoBus.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 </resources>

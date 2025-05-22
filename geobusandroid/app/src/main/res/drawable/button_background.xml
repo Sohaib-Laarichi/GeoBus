@@ -5,9 +5,10 @@
         <shape android:shape="rectangle">
             <gradient
                 android:angle="45"
-                android:endColor="@color/primary"
-                android:startColor="@color/accent" />
-            <corners android:radius="8dp" />
+                android:startColor="@color/accent"
+                android:centerColor="#FF9E40"
+                android:endColor="@color/primary" />
+            <corners android:radius="10dp" />
         </shape>
     </item>
 </ripple>
