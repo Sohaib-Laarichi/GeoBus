@@ -13,7 +13,11 @@
 
         <action
             android:id="@+id/action_mapFragment_to_stopDetailFragment"
-            app:destination="@id/stopDetailFragment" />
+            app:destination="@id/stopDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
 
         <!-- Arguments pour recevoir les coordonnées de navigation -->
         <argument
@@ -43,11 +47,19 @@
         <!-- Optional: Add action to navigate back to login -->
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/loginFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left" />
         <!-- Action to navigate to map after successful registration -->
         <action
             android:id="@+id/action_registerFragment_to_mapFragment"
-            app:destination="@id/mapFragment" />
+            app:destination="@id/mapFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -63,7 +75,11 @@
         <!-- Action pour retourner à la carte avec navigation -->
         <action
             android:id="@+id/action_stop_detail_to_map"
-            app:destination="@id/mapFragment" />
+            app:destination="@id/mapFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left" />
 
     </fragment>
 
@@ -74,10 +90,18 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_mapFragment"
-            app:destination="@id/mapFragment" />
+            app:destination="@id/mapFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment" />
+            app:destination="@id/registerFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
 </navigation>
