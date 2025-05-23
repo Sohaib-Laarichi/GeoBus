@@ -7,6 +7,10 @@ GeoBus is a comprehensive bus tracking system for Marrakech, Morocco. The system
 
 The system aims to improve the public transportation experience in Marrakech by providing real-time information about bus locations and estimated arrival times.
 
+Each component has its own detailed README file:
+- [Backend README](geobus-backend/README.md)
+- [Android App README](geobusandroid/README.md)
+
 ## Architecture
 
 ### Backend Architecture
