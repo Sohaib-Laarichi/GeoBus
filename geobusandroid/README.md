@@ -65,7 +65,7 @@ geobusandroid/
    - For physical device: use the IP address of your computer
 4. Obtain a Google Maps API key and add it to `local.properties`:
    ```
-   MAPS_API_KEY=your_api_key_here
+   MAPS_API_KEY=***************************
    ```
 5. Build and run the app on an emulator or physical device
 
