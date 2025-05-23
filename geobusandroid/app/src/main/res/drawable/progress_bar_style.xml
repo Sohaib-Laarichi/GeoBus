@@ -3,22 +3,23 @@
     <!-- Background -->
     <item android:id="@android:id/background">
         <shape android:shape="ring"
-            android:thickness="4dp"
+            android:thickness="5dp"
             android:useLevel="false">
             <solid android:color="@color/primary_light" />
         </shape>
     </item>
-    
+
     <!-- Progress -->
     <item android:id="@android:id/progress">
         <rotate
             android:fromDegrees="270"
             android:toDegrees="270">
             <shape android:shape="ring"
-                android:thickness="4dp"
+                android:thickness="5dp"
                 android:useLevel="true">
                 <gradient
                     android:startColor="@color/accent"
+                    android:centerColor="#FF9E40"
                     android:endColor="@color/primary"
                     android:type="sweep" />
             </shape>

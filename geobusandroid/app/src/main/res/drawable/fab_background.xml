@@ -5,8 +5,9 @@
         <shape android:shape="oval">
             <gradient
                 android:angle="135"
-                android:endColor="@color/primary"
-                android:startColor="@color/primary_light" />
+                android:startColor="@color/accent"
+                android:centerColor="#FF9E40"
+                android:endColor="#FF5722" />
         </shape>
     </item>
 </ripple>
